@@ -15,6 +15,7 @@
 
 #include <QClipboard>
 #include <QMenu>
+#include <QDesktopServices>
 
 #include "qgsdataitemprovider.h"
 #include "qgsdataprovider.h"
@@ -69,6 +70,21 @@ QList<QMenu *> QgsWfsLayerItem::menus( QWidget *parent )
 
   return menus;
 }
+
+QList<QAction *> QgsWfsLayerItem::actions( QWidget *parent )
+{
+  QList<QAction *> actions;
+  if ( mPath.startsWith( QLatin1String( "geonode:/" ) ) )
+  {
+
+    QAction *actionOpenWebBrowser = new QAction( tr( "Open in Web Browser" ), parent );
+    connect( actionOpenWebBrowser, &QAction::triggered, this, &QgsWfsLayerItem::openWebBrowser );
+    actions << actionOpenWebBrowser;
+  }
+
+  return actions;
+}
+
 
 void QgsWfsLayerItem::copyStyle()
 {
@@ -128,6 +144,33 @@ void QgsWfsLayerItem::copyStyle()
   // Enables the paste menu element
   // actionPasteStyle->setEnabled( true );
 }
+
+
+void QgsWfsLayerItem::openWebBrowser()
+{
+  std::unique_ptr< QgsGeoNodeConnection > connection;
+  const QStringList connections = QgsGeoNodeConnectionUtils::connectionList();
+  for ( const QString &connName : connections )
+  {
+    connection.reset( new QgsGeoNodeConnection( connName ) );
+    if ( mBaseUri.contains( connection->uri().param( QStringLiteral( "url" ) ) ) )
+      break;
+    else
+      connection.reset( nullptr );
+  }
+
+  if ( !connection )
+  {
+    return;
+  }
+
+  QString url( connection->uri().encodedUri() );
+  url.replace( QStringLiteral( "url=" ), QString() );
+  url += QString( "layers/geonode:%1" ).arg( this->name() );
+
+  QDesktopServices::openUrl( QUrl( url ) );
+}
+
 
 //
 // QgsWfsConnectionItem

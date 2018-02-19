@@ -79,6 +79,8 @@ class QgsWfsLayerItem : public QgsLayerItem
     QgsWfsLayerItem( QgsDataItem *parent, QString name, const QgsDataSourceUri &uri, QString featureType, QString title, QString crsString );
 
     QList<QMenu *> menus( QWidget *parent ) override;
+    QList<QAction *> actions( QWidget *parent ) override;
+
 
   protected:
     QString mBaseUri;
@@ -89,6 +91,7 @@ class QgsWfsLayerItem : public QgsLayerItem
      * Get style of the active data item (geonode layer item) and copy it to the clipboard.
      */
     void copyStyle();
+    void openWebBrowser();
 
     /**
      * Paste style on the clipboard to the active data item (geonode layer item) and push it to the source.

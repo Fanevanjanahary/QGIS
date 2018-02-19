@@ -13,6 +13,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <QDesktopServices>
+
 #include "qgslogger.h"
 #include "qgsgeonodedataitems.h"
 #include "qgsproviderregistry.h"
@@ -68,11 +70,13 @@ QVector<QgsDataItem *> QgsGeoNodeConnectionItem::createChildren()
 
 QList<QAction *> QgsGeoNodeConnectionItem::actions( QWidget *parent )
 {
+  QAction *actionOpenWebBrowser = new QAction( tr( "Open in Web Browser" ), parent );
   QAction *actionEdit = new QAction( tr( "Edit Connection…" ), parent );
   QAction *actionDelete = new QAction( tr( "Delete Connection" ), parent );
+  connect( actionOpenWebBrowser, &QAction::triggered, this, &QgsGeoNodeConnectionItem::openWebBrowser );
   connect( actionEdit, &QAction::triggered, this, &QgsGeoNodeConnectionItem::editConnection );
   connect( actionDelete, &QAction::triggered, this, &QgsGeoNodeConnectionItem::deleteConnection );
-  return QList<QAction *>() << actionEdit << actionDelete;
+  return QList<QAction *>() << actionOpenWebBrowser << actionEdit << actionDelete;
 }
 
 void QgsGeoNodeConnectionItem::editConnection()
@@ -85,6 +89,11 @@ void QgsGeoNodeConnectionItem::editConnection()
     // the parent should be updated
     mParent->refresh();
   }
+}
+
+void QgsGeoNodeConnectionItem::openWebBrowser()
+{
+  QDesktopServices::openUrl( QUrl( mConnection->uri().param( QStringLiteral( "url" ) ) ) );
 }
 
 QgsGeoNodeServiceItem::QgsGeoNodeServiceItem( QgsDataItem *parent, QgsGeoNodeConnection *conn, QString serviceName, QString path )

@@ -39,6 +39,7 @@ class QgsGeoNodeConnectionItem : public QgsDataCollectionItem
       QgsGeoNodeConnectionUtils::deleteConnection( name() );
       mParent->refresh();
     }
+    void openWebBrowser();
 
     QString mUri;
     std::unique_ptr< QgsGeoNodeConnection > mConnection = nullptr;
